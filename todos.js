@@ -1,5 +1,5 @@
 const { ApolloServer, gql } = require("apollo-server");
-const { buildFederatedSchema } = require("@apollo/federation");
+const { buildSubgraphSchema } = require("@apollo/subgraph");
 const fetch = require("node-fetch");
 
 const port = 4001;
@@ -22,7 +22,7 @@ const resolvers = {
   Todo: {
     __resolveReference(ref) {
       return fetch(`${apiUrl}/todos/${ref.id}`).then((res) => res.json());
-    },
+    }
   },
   Query: {
     todo(_, { id }) {
@@ -30,12 +30,12 @@ const resolvers = {
     },
     todos() {
       return fetch(`${apiUrl}/todos`).then((res) => res.json());
-    },
+    }
   },
 };
 
 const server = new ApolloServer({
-  schema: buildFederatedSchema([{ typeDefs, resolvers }]),
+  schema: buildSubgraphSchema([{ typeDefs, resolvers }]),
 });
 
 server.listen({ port }).then(({ url }) => {

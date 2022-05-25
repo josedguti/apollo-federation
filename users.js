@@ -1,5 +1,5 @@
 const { ApolloServer, gql } = require("apollo-server");
-const { buildFederatedSchema } = require("@apollo/federation");
+const { buildSubgraphSchema } = require("@apollo/subgraph");
 const fetch = require("node-fetch");
 
 const port = 4002;
@@ -32,8 +32,9 @@ const resolvers = {
 
       return users.filter(({ task }) => task.includes(parseInt(todo.id)));
     },
+  },
   User: {
-    todo(user) {
+    task(user) {
       return user.task.map((id) => ({ __typename: "Todo", id }));
     },
   },
@@ -45,11 +46,10 @@ const resolvers = {
       return fetch(`${apiUrl}/users`).then((res) => res.json());
     },
   },
-}
 };
 
 const server = new ApolloServer({
-  schema: buildFederatedSchema([{ typeDefs, resolvers }]),
+  schema: buildSubgraphSchema([{ typeDefs, resolvers }]),
 });
 
 server.listen({ port }).then(({ url }) => {
